@@ -13,7 +13,7 @@ await mkdir(join(DATA_DIR, 'sessions'), { recursive: true });
 await mkdir(join(DATA_DIR, 'reports'), { recursive: true });
 
 // Initialize from templates if data files don't exist
-for (const file of ['progress.json', 'assessment.json']) {
+for (const file of ['progress.json', 'assessment.json', 'settings.json']) {
   if (!existsSync(join(DATA_DIR, file))) {
     const template = join(DATA_DIR, file.replace('.json', '.template.json'));
     if (existsSync(template)) {
@@ -135,6 +135,19 @@ const server = createServer(async (req, res) => {
       if (path === '/api/sentences' && req.method === 'GET') {
         const sentences = await readJSON(join(DATA_DIR, 'sentences.json'));
         res.end(JSON.stringify(sentences || []));
+        return;
+      }
+
+      // GET/POST settings
+      if (path === '/api/settings' && req.method === 'GET') {
+        const settings = await readJSON(join(DATA_DIR, 'settings.json'));
+        res.end(JSON.stringify(settings || {}));
+        return;
+      }
+      if (path === '/api/settings' && req.method === 'POST') {
+        const body = await getBody(req);
+        await writeJSON(join(DATA_DIR, 'settings.json'), JSON.parse(body));
+        res.end(JSON.stringify({ ok: true }));
         return;
       }
 

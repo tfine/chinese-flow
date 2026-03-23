@@ -3,4 +3,5 @@ data/progress.json
 data/sessions/
 data/reports/
 data/assessment.json
+data/settings.json
 .DS_Store

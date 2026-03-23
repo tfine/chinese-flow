@@ -3,6 +3,7 @@ let vocab = [];
 let sentences = [];
 let progress = {};
 let assessment = {};
+let settings = {};
 let sessionAnswers = [];
 let currentQ = null;
 let questionStart = 0;
@@ -17,8 +18,7 @@ let currentMode = 'cascade';
 let cascadeQueue = [];      // Pimsleur-style queue: items scheduled at specific times
 let cascadeStartTime = 0;
 let newWordsThisSession = 0;
-const MAX_NEW_PER_SESSION = 5;
-const TRIP_DATE = new Date('2026-05-03'); // 6 weeks from ~March 22
+let MAX_NEW_PER_SESSION = 5;
 
 // ─── SM-2 ───────────────────────────────────────────
 function sm2(prev, quality) {
@@ -48,15 +48,27 @@ function qualityFromResult(correct, responseMs) {
 }
 
 // ─── DATA ───────────────────────────────────────────
+function getGoalDate() {
+  if (settings.goal && settings.goal.date) return new Date(settings.goal.date);
+  return null;
+}
+
+function getGoalLabel() {
+  if (settings.goal && settings.goal.label) return settings.goal.label;
+  return 'Goal';
+}
+
 async function loadData() {
-  [vocab, sentences, progress, assessment] = await Promise.all([
+  [vocab, sentences, progress, assessment, settings] = await Promise.all([
     fetch('/api/vocabulary').then(r => r.json()),
     fetch('/api/sentences').then(r => r.json()),
     fetch('/api/progress').then(r => r.json()),
     fetch('/api/assessment').then(r => r.json()).catch(() => ({})),
+    fetch('/api/settings').then(r => r.json()).catch(() => ({})),
   ]);
+  if (settings.newWordsPerSession) MAX_NEW_PER_SESSION = settings.newWordsPerSession;
   updateDueInfo();
-  updateTripCountdown();
+  updateGoalCountdown();
   updateCoachPanel();
 }
 
@@ -215,15 +227,64 @@ function updateCoachPanel() {
   }
 }
 
-// ─── TRIP COUNTDOWN ─────────────────────────────────
-function updateTripCountdown() {
-  const days = Math.ceil((TRIP_DATE - new Date()) / 86400000);
+// ─── GOAL COUNTDOWN ─────────────────────────────────
+function updateGoalCountdown() {
   const el = document.getElementById('trip-countdown');
-  if (days > 0) {
-    el.textContent = `🇨🇳 ${days} days until China`;
-  } else {
-    el.textContent = `🇨🇳 You're in China! Keep learning!`;
+  const goalDate = getGoalDate();
+  if (!goalDate || !settings.goal.date) {
+    el.innerHTML = `<span style="cursor:pointer" onclick="showGoalEditor()">Set a goal →</span>`;
+    return;
   }
+  const days = Math.ceil((goalDate - new Date()) / 86400000);
+  const label = getGoalLabel();
+  if (days > 0) {
+    el.innerHTML = `<span style="cursor:pointer" onclick="showGoalEditor()">${days} days until ${label}</span>`;
+  } else {
+    el.innerHTML = `<span style="cursor:pointer" onclick="showGoalEditor()">${label} is here! Keep learning!</span>`;
+  }
+}
+
+function showGoalEditor() {
+  const el = document.getElementById('trip-countdown');
+  const currentLabel = settings.goal?.label || '';
+  const currentDate = settings.goal?.date || '';
+  el.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+      <input id="goal-label" type="text" placeholder="Goal name (e.g. China trip)" value="${currentLabel}"
+        style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:4px;font-family:inherit;font-size:0.85rem;width:220px;text-align:center">
+      <input id="goal-date" type="date" value="${currentDate}"
+        style="background:var(--bg);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:4px;font-family:inherit;font-size:0.85rem;width:220px;text-align:center">
+      <div style="display:flex;gap:8px">
+        <button onclick="saveGoal()" style="background:var(--accent);color:#000;border:none;padding:5px 16px;border-radius:4px;font-family:inherit;cursor:pointer;font-size:0.8rem">Save</button>
+        <button onclick="clearGoal()" style="background:var(--surface);color:var(--dim);border:1px solid var(--border);padding:5px 16px;border-radius:4px;font-family:inherit;cursor:pointer;font-size:0.8rem">Clear</button>
+      </div>
+    </div>`;
+  // Prevent keys from triggering game start
+  for (const id of ['goal-label', 'goal-date']) {
+    document.getElementById(id).addEventListener('keydown', e => e.stopPropagation());
+  }
+}
+
+async function saveGoal() {
+  const label = document.getElementById('goal-label').value.trim();
+  const date = document.getElementById('goal-date').value;
+  settings.goal = { label: label || 'Goal', date };
+  await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings),
+  });
+  updateGoalCountdown();
+}
+
+async function clearGoal() {
+  settings.goal = { label: '', date: '' };
+  await fetch('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(settings),
+  });
+  updateGoalCountdown();
 }
 
 // ─── DUE INFO ───────────────────────────────────────
@@ -1164,10 +1225,11 @@ function showSessionSummary() {
 
   // Total learned snapshot
   const learned = Object.keys(progress).length;
-  const daysLeft = Math.ceil((TRIP_DATE - new Date()) / 86400000);
+  const goalDate = getGoalDate();
+  const daysLeft = goalDate ? Math.ceil((goalDate - new Date()) / 86400000) : null;
   html += `<div style="margin-top:20px;padding:12px;background:var(--surface);border-radius:6px;text-align:center">`;
   html += `<span style="color:var(--dim)">Total: </span><span style="color:var(--accent2);font-weight:700">${learned} words</span>`;
-  html += `<span style="color:var(--dim)"> · ${daysLeft} days to trip</span>`;
+  if (daysLeft !== null) html += `<span style="color:var(--dim)"> · ${daysLeft > 0 ? daysLeft + ' days to ' + getGoalLabel() : getGoalLabel() + '!'}</span>`;
   html += `</div>`;
 
   statsEl.innerHTML = html;
@@ -1274,8 +1336,11 @@ function showStats() {
   html += `<h2>Overview</h2>`;
   html += `<div class="stat-row"><span class="stat-label">Words Encountered</span><span class="stat-value neutral">${totalSeen} / ${totalVocab}</span></div>`;
   html += `<div class="stat-row"><span class="stat-label">Due for Review</span><span class="stat-value ${due > 20 ? 'bad' : 'neutral'}">${due}</span></div>`;
-  const daysLeft = Math.ceil((TRIP_DATE - new Date()) / 86400000);
-  html += `<div class="stat-row"><span class="stat-label">Days Until Trip</span><span class="stat-value neutral">${daysLeft > 0 ? daysLeft : 'You\'re there!'}</span></div>`;
+  const goalDate = getGoalDate();
+  const daysLeft = goalDate ? Math.ceil((goalDate - new Date()) / 86400000) : null;
+  if (daysLeft !== null) {
+    html += `<div class="stat-row"><span class="stat-label">Days Until ${getGoalLabel()}</span><span class="stat-value neutral">${daysLeft > 0 ? daysLeft : 'Now!'}</span></div>`;
+  }
   const totalHistory = Object.values(progress).reduce((s, p) => s + (p.history || []).length, 0);
   const totalDays = new Set(Object.values(progress).flatMap(p => (p.history || []).map(h => h.date.slice(0, 10)))).size;
   html += `<div class="stat-row"><span class="stat-label">Total Answers</span><span class="stat-value neutral">${totalHistory}</span></div>`;
