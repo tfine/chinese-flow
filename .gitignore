@@ -4,4 +4,6 @@ data/sessions/
 data/reports/
 data/assessment.json
 data/settings.json
+data/notes.json
+data/reading-sentences.json
 .DS_Store

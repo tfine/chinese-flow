@@ -138,6 +138,13 @@ const server = createServer(async (req, res) => {
         return;
       }
 
+      // GET reading sentences (generated for current level)
+      if (path === '/api/reading-sentences' && req.method === 'GET') {
+        const rs = await readJSON(join(DATA_DIR, 'reading-sentences.json'));
+        res.end(JSON.stringify(rs || []));
+        return;
+      }
+
       // GET/POST settings
       if (path === '/api/settings' && req.method === 'GET') {
         const settings = await readJSON(join(DATA_DIR, 'settings.json'));
@@ -148,6 +155,26 @@ const server = createServer(async (req, res) => {
         const body = await getBody(req);
         await writeJSON(join(DATA_DIR, 'settings.json'), JSON.parse(body));
         res.end(JSON.stringify({ ok: true }));
+        return;
+      }
+
+      // POST save a note from the user about a word
+      if (path === '/api/note' && req.method === 'POST') {
+        const body = await getBody(req);
+        const { vocabId, note } = JSON.parse(body);
+        const notesPath = join(DATA_DIR, 'notes.json');
+        const notes = await readJSON(notesPath) || {};
+        if (!notes[vocabId]) notes[vocabId] = [];
+        notes[vocabId].push({ note, date: new Date().toISOString() });
+        await writeJSON(notesPath, notes);
+        res.end(JSON.stringify({ ok: true }));
+        return;
+      }
+
+      // GET notes
+      if (path === '/api/notes' && req.method === 'GET') {
+        const notes = await readJSON(join(DATA_DIR, 'notes.json'));
+        res.end(JSON.stringify(notes || {}));
         return;
       }
 

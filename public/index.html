@@ -24,7 +24,8 @@
       </div>
 
       <div class="menu">
-        <button data-key="1" onclick="startMode('cascade')" class="btn-go"><kbd>Space</kbd> Start Learning</button>
+        <button data-key="1" onclick="startMode()" class="btn-go"><kbd>Space</kbd> Start Learning</button>
+        <button data-key="2" onclick="startReadingMode()"><kbd>2</kbd> Reading Mode</button>
         <button data-key="5" onclick="showStats()"><kbd>5</kbd> Progress Report</button>
       </div>
       <div class="due-info" id="due-info"></div>
@@ -57,7 +58,7 @@
       </div>
       <div class="choices" id="choices"></div>
       <div class="feedback" id="feedback"></div>
-      <div class="hint-bar" id="hint-bar"><kbd>1</kbd>-<kbd>4</kbd> answer · <kbd>Space</kbd>/<kbd>Enter</kbd> don't know / continue · <kbd>R</kbd> replay · <kbd>Q</kbd> quit</div>
+      <div class="hint-bar" id="hint-bar"><kbd>1</kbd>-<kbd>4</kbd> answer · <kbd>G</kbd> guessing · <kbd>Space</kbd> don't know / continue · <kbd>R</kbd> replay · <kbd>N</kbd> note · <kbd>Q</kbd> quit</div>
     </div>
   </div>
 
@@ -71,6 +72,6 @@
   </div>
 </div>
 
-<script src="app.js?v=8"></script>
+<script src="app.js?v=21"></script>
 </body>
 </html>

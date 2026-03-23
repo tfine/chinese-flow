@@ -14,9 +14,22 @@ let streak = 0;
 let bestStreak = 0;
 let answered = false;
 let gameState = 'question'; // 'question' | 'feedback' | 'intro' | 'deepdive'
+let guessing = false; // true when user flagged "not sure" before answering
 let cascadeStartTime = 0;
 let newWordsThisSession = 0;
-let MAX_NEW_PER_SESSION = 5;
+// ─── TUNING ─────────────────────────────────────────
+// All magic numbers live in settings.tuning. T() reads them with defaults.
+const DEFAULTS = {
+  newWordsPerSession: 5, maxInterval: 21, minDrillsForNewWord: 4, newWordSpiralGap: 2,
+  spotCheckRate: 0.25, spotCheckRateDuringNewWords: 0.10, weaknessVsConfidenceRatio: 0.7,
+  charStudyTriggerThreshold: 0.3, charStudyReadMin: 0.9, charStudyReverseMax: 0.7,
+  deepDiveWrongThreshold: 2, sessionCapCorrect: 5, sessionCapOneWrong: 3, sessionCapTwoWrong: 0,
+  speedThresholdFast: 2000, speedThresholdMedium: 4000,
+  listeningRateShort: 170, listeningRateLong: 150, sentenceAudioRate: 130, introAudioRate: 140,
+  sentenceInterval: 12, maxSentencesPerSession: 5,
+  strugglingThreshold: 0.7, cruisingThreshold: 0.9, cruisingNewWordGap: 3, normalNewWordGap: 5,
+};
+function T(key) { return settings.tuning?.[key] ?? DEFAULTS[key]; }
 
 // Adaptive engine session state
 let sessionIntroduced = [];
@@ -41,6 +54,7 @@ function sm2(prev, quality) {
     interval = 1;
     ef = Math.max(1.3, ef - 0.2);
   }
+  interval = Math.min(interval, T('maxInterval'));
   const next = new Date();
   next.setDate(next.getDate() + interval);
   return { ef: Math.round(ef * 100) / 100, interval, reps, nextReview: next.toISOString().slice(0, 10) };
@@ -48,8 +62,8 @@ function sm2(prev, quality) {
 
 function qualityFromResult(correct, responseMs) {
   if (!correct) return 1;
-  if (responseMs < 2000) return 5;
-  if (responseMs < 4000) return 4;
+  if (responseMs < T('speedThresholdFast')) return 5;
+  if (responseMs < T('speedThresholdMedium')) return 4;
   return 3;
 }
 
@@ -70,7 +84,6 @@ async function loadData() {
     fetch('/api/assessment').then(r => r.json()).catch(() => ({})),
     fetch('/api/settings').then(r => r.json()).catch(() => ({})),
   ]);
-  if (settings.newWordsPerSession) MAX_NEW_PER_SESSION = settings.newWordsPerSession;
   updateDueInfo();
   updateGoalCountdown();
   updateCoachPanel();
@@ -263,45 +276,105 @@ function updateDueInfo() {
 }
 
 // ─── DRILL TYPES ────────────────────────────────────
-function pickDistractors(correct, pool, count) {
-  const others = pool.filter(v => v.id !== correct.id).sort(() => Math.random() - 0.5);
-  const sameCat = others.filter(v => v.cat === correct.cat);
-  const diffCat = others.filter(v => v.cat !== correct.cat);
-  return [...sameCat, ...diffCat].slice(0, count);
+function pickDistractors(correct, pool, count, field) {
+  // field = which property will be shown as the answer text ('en', 'pinyin', 'zh')
+  // Exclude duplicates where the displayed answer would be identical
+  const correctValue = field ? correct[field] : null;
+  const others = pool.filter(v => {
+    if (v.id === correct.id) return false;
+    if (correctValue && v[field] === correctValue) return false; // same display text = useless distractor
+    return true;
+  }).sort(() => Math.random() - 0.5);
+  const correctLen = correct.zh.length;
+  const sameLen = others.filter(v => v.zh.length === correctLen);
+  const diffLen = others.filter(v => v.zh.length !== correctLen);
+  const sameLenSameCat = sameLen.filter(v => v.cat === correct.cat);
+  const sameLenDiffCat = sameLen.filter(v => v.cat !== correct.cat);
+  return [...sameLenSameCat, ...sameLenDiffCat, ...diffLen].slice(0, count);
+}
+
+function pickMeaningDistractors(correct, pool, count) {
+  const others = pool.filter(v => v.id !== correct.id && v.en !== correct.en).sort(() => Math.random() - 0.5);
+  const correctEnLen = correct.en.length;
+  const scored = others.map(v => ({
+    item: v,
+    lenDiff: Math.abs(v.en.length - correctEnLen) + Math.abs(v.zh.length - correct.zh.length) * 3
+  })).sort((a, b) => a.lenDiff - b.lenDiff);
+  return scored.slice(0, count).map(s => s.item);
 }
 
 function drillCharToEn(item) {
-  const choices = [item, ...pickDistractors(item, vocab, 3)].sort(() => Math.random() - 0.5);
+  const choices = [item, ...pickMeaningDistractors(item, vocab, 3)].sort(() => Math.random() - 0.5);
   return { promptZh: item.zh, promptPinyin: '', promptEn: '', showAudio: true, audioText: item.zh,
     choices: choices.map(v => ({ text: v.en, sub: '' })), correctIdx: choices.indexOf(item),
     badge: 'CHARACTER → MEANING', vocabId: item.id };
 }
 
 function drillCharToPinyin(item) {
-  const choices = [item, ...pickDistractors(item, vocab, 3)].sort(() => Math.random() - 0.5);
+  const choices = [item, ...pickDistractors(item, vocab, 3, 'pinyin')].sort(() => Math.random() - 0.5);
   return { promptZh: item.zh, promptPinyin: '', promptEn: '', showAudio: false,
     choices: choices.map(v => ({ text: v.pinyin, sub: '' })), correctIdx: choices.indexOf(item),
     badge: 'CHARACTER → PINYIN', vocabId: item.id };
 }
 
 function drillListening(item) {
-  const choices = [item, ...pickDistractors(item, vocab, 3)].sort(() => Math.random() - 0.5);
+  const choices = [item, ...pickMeaningDistractors(item, vocab, 3)].sort(() => Math.random() - 0.5);
   return { promptZh: '', promptPinyin: '', promptEn: '', showAudio: true, audioText: item.zh,
-    audioRate: item.zh.length >= 3 ? 150 : 170, autoPlay: true,
+    audioRate: item.zh.length >= 3 ? T('listeningRateLong') : T('listeningRateShort'), autoPlay: true,
     choices: choices.map(v => ({ text: v.en, sub: '' })), correctIdx: choices.indexOf(item),
     badge: 'LISTENING', vocabId: item.id };
 }
 
 function drillEnToChinese(item) {
-  const choices = [item, ...pickDistractors(item, vocab, 3)].sort(() => Math.random() - 0.5);
+  const choices = [item, ...pickDistractors(item, vocab, 3, 'zh')].sort(() => Math.random() - 0.5);
   return { promptZh: '', promptPinyin: '', promptEn: item.en, showAudio: false,
     choices: choices.map(v => ({ text: v.zh, sub: v.pinyin, isChinese: true })), correctIdx: choices.indexOf(item),
     badge: 'MEANING → CHARACTER', vocabId: item.id };
 }
 
+function drillCharStudy(item) {
+  // Not a quiz — a focused character study moment.
+  // Shows the character large, breaks it down, plays audio, then asks a simple confirm.
+  // This builds the visual memory that multiple choice can't.
+  const chars = [...item.zh];
+  const breakdownHtml = chars.map(char => {
+    const cv = vocab.find(v => v.zh === char && v.id !== item.id);
+    return `<div style="text-align:center;padding:8px">
+      <div style="font-size:4rem;font-family:'PingFang SC',sans-serif;line-height:1">${char}</div>
+      <div style="font-size:0.75rem;color:var(--dim)">${cv ? cv.en : ''}</div>
+    </div>`;
+  }).join('');
+
+  return {
+    promptZh: '',
+    promptPinyin: '',
+    promptEn: item.en,
+    showAudio: true,
+    audioText: item.zh,
+    audioRate: T('introAudioRate'),
+    isCharStudy: true,
+    charStudyItem: item,
+    charStudyHtml: `
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:7rem;font-family:'PingFang SC',sans-serif;line-height:1;letter-spacing:0.1em">${item.zh}</div>
+        <div style="font-size:1.2rem;color:var(--accent2);margin-top:8px">${item.pinyin}</div>
+      </div>
+      ${chars.length > 1 ? `<div style="display:flex;justify-content:center;gap:12px;margin:8px 0">${breakdownHtml}</div>` : ''}
+      ${item.memo ? `<div style="background:var(--surface);border:1px solid var(--accent);border-radius:6px;padding:10px 14px;margin:8px auto;max-width:500px;font-size:0.85rem;line-height:1.5;text-align:left">${item.memo}</div>` : ''}
+    `,
+    choices: [
+      { text: 'I can see it now', sub: '' },
+      { text: 'Still fuzzy', sub: '' },
+    ],
+    correctIdx: 0, // "I can see it" = correct, "Still fuzzy" = wrong (triggers re-study)
+    badge: 'CHARACTER STUDY',
+    vocabId: item.id,
+  };
+}
+
 function drillSentence(sent) {
   const choices = [sent, ...sentences.filter(s => s.id !== sent.id).sort(() => Math.random() - 0.5).slice(0, 3)].sort(() => Math.random() - 0.5);
-  return { promptZh: sent.zh, promptPinyin: '', promptEn: '', showAudio: true, audioText: sent.zh, audioRate: 130,
+  return { promptZh: sent.zh, promptPinyin: '', promptEn: '', showAudio: true, audioText: sent.zh, audioRate: T('sentenceAudioRate'),
     choices: choices.map(s => ({ text: s.en, sub: '' })), correctIdx: choices.indexOf(sent),
     badge: 'SENTENCE COMPREHENSION', vocabId: null, sentenceId: sent.id };
 }
@@ -309,7 +382,8 @@ function drillSentence(sent) {
 // ─── ADAPTIVE CASCADE ENGINE ────────────────────────
 function drillNameToKey(drillName) {
   return { 'CHARACTER → MEANING': 'charToEn', 'CHARACTER → PINYIN': 'charToPinyin',
-    'LISTENING': 'listening', 'MEANING → CHARACTER': 'enToChinese' }[drillName] || 'charToEn';
+    'LISTENING': 'listening', 'MEANING → CHARACTER': 'enToChinese',
+    'CHARACTER STUDY': 'charStudy' }[drillName] || 'charToEn';
 }
 
 function pickSmartDrill(item) {
@@ -325,6 +399,18 @@ function pickSmartDrill(item) {
   for (const h of allHistory) {
     const key = drillNameToKey(h.drill);
     if (drillPerf[key]) { drillPerf[key].total++; drillPerf[key].totalMs += h.responseMs; if (h.correct) drillPerf[key].correct++; }
+  }
+
+  // Check if this word has a character recognition gap (reads well but can't recall shape)
+  const readPerf = drillPerf['charToEn'];
+  const revPerf = drillPerf['enToChinese'];
+  if (readPerf.total >= 2 && revPerf.total >= 1) {
+    const readAcc = readPerf.correct / readPerf.total;
+    const revAcc = revPerf.correct / revPerf.total;
+    // Big gap: reads 90%+ but reverse < 70% — trigger character study ~30% of the time
+    if (readAcc >= T('charStudyReadMin') && revAcc < T('charStudyReverseMax') && !sessionDrills.has('CHARACTER STUDY') && Math.random() < T('charStudyTriggerThreshold')) {
+      return 'charStudy';
+    }
   }
 
   // Priority 1: drill types never tested on this word (in learning order)
@@ -357,7 +443,7 @@ function pickSmartDrill(item) {
   }).sort((a, b) => a.score - b.score);
 
   // 70% weakest, 30% strongest — keeps sessions balanced
-  if (scored.length >= 2 && Math.random() < 0.3) {
+  if (scored.length >= 2 && Math.random() < (1 - T('weaknessVsConfidenceRatio'))) {
     return scored[scored.length - 1].drill; // strongest
   }
   return scored[0].drill; // weakest
@@ -367,26 +453,39 @@ function notOverdrilled(v) {
   const sh = sessionWordHistory[v.id] || [];
   if (sh.length === 0) return true;
   const wrongCount = sh.filter(h => !h.correct).length;
-  if (wrongCount >= 2) return false;
-  if (wrongCount === 0) return sh.length < 5;
-  return sh.length < 3;
+  if (wrongCount >= T('deepDiveWrongThreshold')) return false;
+  if (wrongCount === 0) return sh.length < T('sessionCapCorrect');
+  return sh.length < T('sessionCapOneWrong');
 }
 
 function decideNextAction() {
   const today = new Date().toISOString().slice(0, 10);
   const knownWords = vocab.filter(v => progress[v.id] && progress[v.id].history.length > 0);
 
-  // Spiral-backs for recently introduced words
+  // PRIORITY 1: New words that haven't been drilled enough yet
+  // Every new word MUST get at least 4 drills across different types before anything else
+  for (const intro of sessionIntroduced) {
+    if (intro.timesTestedThisSession < T('minDrillsForNewWord') && notOverdrilled(intro.item)) {
+      intro.questionsSinceTest++;
+      if (intro.questionsSinceTest >= T('newWordSpiralGap')) {
+        intro.questionsSinceTest = 0;
+        intro.timesTestedThisSession++;
+        return { type: 'test', item: intro.item, drill: pickSmartDrill(intro.item) };
+      }
+    }
+  }
+
+  // Spiral-backs for words already drilled 4+ times (looser schedule)
   let spiralResult = null;
   for (const intro of sessionIntroduced) {
-    if (!notOverdrilled(intro.item)) continue;
-    intro.questionsSinceTest++;
-    const thresholds = [2, 5, 10, 20];
-    const threshold = thresholds[Math.min(intro.timesTestedThisSession, thresholds.length - 1)];
-    if (intro.questionsSinceTest >= threshold && intro.timesTestedThisSession < 5 && !spiralResult) {
-      intro.questionsSinceTest = 0;
-      intro.timesTestedThisSession++;
-      spiralResult = { type: 'test', item: intro.item, drill: pickSmartDrill(intro.item) };
+    if (intro.timesTestedThisSession >= T('minDrillsForNewWord') && notOverdrilled(intro.item)) {
+      intro.questionsSinceTest++;
+      const threshold = Math.min(10, intro.timesTestedThisSession * 3);
+      if (intro.questionsSinceTest >= threshold && !spiralResult) {
+        intro.questionsSinceTest = 0;
+        intro.timesTestedThisSession++;
+        spiralResult = { type: 'test', item: intro.item, drill: pickSmartDrill(intro.item) };
+      }
     }
   }
   if (spiralResult) return spiralResult;
@@ -397,7 +496,7 @@ function decideNextAction() {
     if (!lastAttempt.correct) {
       const gap = total - lastAttempt.questionNum;
       const wrongCount = hist.filter(h => !h.correct).length;
-      if (wrongCount >= 2 && gap >= 2 && gap < 8 && !sessionDeepDived.has(vocabId)) {
+      if (wrongCount >= T('deepDiveWrongThreshold') && gap >= 2 && gap < 8 && !sessionDeepDived.has(vocabId)) {
         const item = vocab.find(v => v.id === vocabId);
         if (item) {
           if (progress[vocabId]) { progress[vocabId].stuck = true; saveProgress(); }
@@ -415,9 +514,9 @@ function decideNextAction() {
   const recentAnswers = sessionAnswers.slice(-10);
   const recentAccuracy = recentAnswers.length > 0
     ? recentAnswers.filter(a => a.correct).length / recentAnswers.length : 1;
-  const struggling = recentAccuracy < 0.7;
-  const cruising = recentAccuracy >= 0.9 && sessionAnswers.length >= 5;
-  const effectiveMaxNew = struggling ? Math.min(2, MAX_NEW_PER_SESSION) : MAX_NEW_PER_SESSION;
+  const struggling = recentAccuracy < T('strugglingThreshold');
+  const cruising = recentAccuracy >= T('cruisingThreshold') && sessionAnswers.length >= 5;
+  const effectiveMaxNew = struggling ? Math.min(2, T('newWordsPerSession')) : T('newWordsPerSession');
 
   const dueCards = getDueCards().sort((a, b) => (progress[a.id].ef || 2.5) - (progress[b.id].ef || 2.5));
   const dueAvailable = dueCards.filter(notOverdrilled);
@@ -427,6 +526,21 @@ function decideNextAction() {
 
   // Build pools
   const strongWords = knownWords.filter(v => (progress[v.id].ef || 2.5) >= 2.0).filter(notOverdrilled);
+
+  // ─── SPOT CHECK: randomly revisit ANY known word regardless of SM-2 schedule ───
+  // Reduced when new words still need drilling, full rate otherwise
+  const underDrilledNew = sessionIntroduced.filter(i => i.timesTestedThisSession < T('minDrillsForNewWord')).length;
+  const spotCheckRate = underDrilledNew > 0 ? T('spotCheckRateDuringNewWords') : T('spotCheckRate');
+  if (knownWords.length >= 5 && total > 2 && Math.random() < spotCheckRate) {
+    const spotCheckPool = knownWords.filter(notOverdrilled);
+    if (spotCheckPool.length > 0) {
+      // Weighted: prefer words not seen recently in this session
+      const notSeenThisSession = spotCheckPool.filter(v => !sessionWordHistory[v.id]);
+      const pool = notSeenThisSession.length > 0 ? notSeenThisSession : spotCheckPool;
+      const item = pool[Math.floor(Math.random() * pool.length)];
+      return { type: 'test', item, drill: pickSmartDrill(item) };
+    }
+  }
 
   // Decision tree — balances weak/strong, new/review, and variety
   if (struggling && weakWords.length > 0) {
@@ -446,12 +560,12 @@ function decideNextAction() {
   }
 
   if (newWordsThisSession < effectiveMaxNew && newCards.length > 0 && !struggling) {
-    questionsUntilNewWord = cruising ? 3 : 5;
+    questionsUntilNewWord = cruising ? T('cruisingNewWordGap') : T('normalNewWordGap');
     return { type: 'intro', item: newCards[0] };
   }
 
   // Sentence challenge every ~12 questions
-  if (knownWords.length >= 8 && total > 0 && total % 12 === 0 && sessionSentenceCount < 5) {
+  if (knownWords.length >= 8 && total > 0 && total % T('sentenceInterval') === 0 && sessionSentenceCount < T('maxSentencesPerSession')) {
     const s = sentences.filter(s => s.diff <= 2).sort(() => Math.random() - 0.5)[0];
     if (s) { sessionSentenceCount++; return { type: 'sentence', sentence: s }; }
   }
@@ -513,7 +627,7 @@ function nextQuestion() {
   if (action.type === 'intro') { showIntro(action.item); return; }
   if (action.type === 'deepdive') { showDeepDive(action.item); return; }
 
-  const drillFns = { charToEn: drillCharToEn, charToPinyin: drillCharToPinyin, listening: drillListening, enToChinese: drillEnToChinese };
+  const drillFns = { charToEn: drillCharToEn, charToPinyin: drillCharToPinyin, listening: drillListening, enToChinese: drillEnToChinese, charStudy: drillCharStudy };
   let q;
   if (action.type === 'sentence') {
     q = drillSentence(action.sentence);
@@ -525,8 +639,14 @@ function nextQuestion() {
 
   currentQ = q;
   answered = false;
+  guessing = false;
   gameState = 'question';
   renderQuestion(q);
+
+  // Character study: replace prompt area with study content
+  if (q.isCharStudy) {
+    document.getElementById('prompt-area').innerHTML = q.charStudyHtml;
+  }
 
   const rate = q.audioRate || 180;
   if (q.autoPlay && q.audioText) setTimeout(() => playAudio(q.audioText, rate), 300);
@@ -657,7 +777,7 @@ function showIntro(item) {
   feedbackEl.className = 'feedback';
 
   lastAudioText = item.zh;
-  playAudio(item.zh, 140);
+  playAudio(item.zh, T('introAudioRate'));
 
   if (!progress[item.id]) {
     progress[item.id] = { ef: 2.5, interval: 0, reps: 0, nextReview: new Date().toISOString().slice(0, 10), history: [] };
@@ -703,12 +823,27 @@ function renderQuestion(q) {
     choicesEl.appendChild(btn);
   });
 
+  // Don't show don't-know/guess for character study (it has its own 2 choices)
+  if (q.isCharStudy) { updateHUD(); return; }
+
+  const bottomRow = document.createElement('div');
+  bottomRow.style.cssText = 'grid-column:1/-1;display:flex;gap:8px';
+
   const dkBtn = document.createElement('button');
   dkBtn.className = 'choice fade-in dont-know';
-  dkBtn.style.animationDelay = '0.2s';
+  dkBtn.style.cssText += ';flex:1';
   dkBtn.innerHTML = `<span class="choice-key">Space</span><span>Don't know</span>`;
   dkBtn.onclick = () => handleDontKnow();
-  choicesEl.appendChild(dkBtn);
+
+  const lgBtn = document.createElement('button');
+  lgBtn.className = 'choice fade-in dont-know';
+  lgBtn.style.cssText += ';flex:1';
+  lgBtn.innerHTML = `<span class="choice-key">G</span><span>Guess / not sure</span>`;
+  lgBtn.onclick = () => { guessing = true; };
+
+  bottomRow.appendChild(dkBtn);
+  bottomRow.appendChild(lgBtn);
+  choicesEl.appendChild(bottomRow);
 
   updateHUD();
 }
@@ -757,7 +892,7 @@ function handleDontKnow() {
     feedbackEl.innerHTML = `Study this one<div class="feedback-detail">${detail}</div>${memoLine}`;
     feedbackEl.className = 'feedback show-wrong';
     feedbackEl.innerHTML += `<div style="margin-top:8px;color:var(--dim);font-size:0.8rem">Press <kbd style="background:var(--border);color:var(--text);padding:1px 6px;border-radius:3px">Space</kbd> to continue</div>`;
-    if (v) playAudio(v.zh, 140);
+    if (v) playAudio(v.zh, T('introAudioRate'));
   } catch (err) { console.error('[handleDontKnow]', err); }
 
   updateHUD();
@@ -766,13 +901,17 @@ function handleDontKnow() {
 // ─── HANDLE ANSWER ──────────────────────────────────
 function handleAnswer(idx) {
   if (answered) return;
+  if (!currentQ || idx >= currentQ.choices.length) return;
   answered = true;
   gameState = 'feedback';
   if (timerInterval) clearInterval(timerInterval);
 
   const responseMs = Date.now() - questionStart;
   const correct = idx === currentQ.correctIdx;
-  const quality = qualityFromResult(correct, responseMs);
+  const wasGuessing = guessing;
+  guessing = false;
+  // Quality: guessing + correct = 2 (interval resets, word comes back soon)
+  const quality = wasGuessing && correct ? 2 : qualityFromResult(correct, responseMs);
 
   total++;
   if (correct) { score++; streak++; if (streak > bestStreak) bestStreak = streak; }
@@ -798,7 +937,7 @@ function handleAnswer(idx) {
     saveProgress();
   }
 
-  sessionAnswers.push({ vocabId: currentQ.vocabId, sentenceId: currentQ.sentenceId || null, drill: currentQ.badge, correct, responseMs, quality });
+  sessionAnswers.push({ vocabId: currentQ.vocabId, sentenceId: currentQ.sentenceId || null, drill: currentQ.badge, correct, responseMs, quality, guessed: wasGuessing });
   if (currentQ.vocabId) {
     if (!sessionWordHistory[currentQ.vocabId]) sessionWordHistory[currentQ.vocabId] = [];
     sessionWordHistory[currentQ.vocabId].push({ drill: currentQ.badge, correct, responseMs, questionNum: total });
@@ -812,9 +951,15 @@ function handleAnswer(idx) {
 
     const feedbackEl = document.getElementById('feedback');
     if (correct) {
-      const speedMsg = responseMs < 2000 ? '⚡ Lightning!' : responseMs < 4000 ? '✓ Good' : '✓ Correct';
-      feedbackEl.innerHTML = `${speedMsg}${streak >= 3 ? ` · 🔥 ${streak} streak` : ''}`;
-      feedbackEl.className = 'feedback show-correct';
+      let speedMsg;
+      if (wasGuessing) {
+        speedMsg = '🎯 Lucky guess — will review again soon';
+        feedbackEl.className = 'feedback show-correct';
+      } else {
+        speedMsg = responseMs < 2000 ? '⚡ Lightning!' : responseMs < 4000 ? '✓ Good' : '✓ Correct';
+        feedbackEl.className = 'feedback show-correct';
+      }
+      feedbackEl.innerHTML = `${speedMsg}${!wasGuessing && streak >= 3 ? ` · 🔥 ${streak} streak` : ''}`;
       if (currentQ.vocabId) {
         const v = vocab.find(x => x.id === currentQ.vocabId);
         if (v) feedbackEl.innerHTML += `<div class="feedback-detail">${v.zh} · ${v.pinyin} · ${v.en}</div>`;
@@ -990,6 +1135,134 @@ function showStats() {
   showScreen('stats');
 }
 
+// ─── READING MODE ───────────────────────────────────
+let readingPool = [];
+let readingIdx = 0;
+let readingShowMeaning = false;
+
+async function startReadingMode() {
+  // Load level-appropriate reading sentences generated by Claude Code
+  const readingSentences = await fetch('/api/reading-sentences').then(r => r.json()).catch(() => []);
+
+  const knownWords = vocab.filter(v => progress[v.id] && progress[v.id].history.length > 0);
+  const shuffledWords = knownWords.sort(() => Math.random() - 0.5)
+    .map(v => ({ type: 'word', zh: v.zh, pinyin: v.pinyin, en: v.en, memo: v.memo }));
+  const shuffledSents = readingSentences.sort(() => Math.random() - 0.5)
+    .map(s => ({ type: 'sentence', zh: s.zh, pinyin: s.pinyin, en: s.en }));
+
+  // Interleave: word, word, sentence, word, word, sentence...
+  readingPool = [];
+  let wi = 0, si = 0;
+  while (wi < shuffledWords.length || si < shuffledSents.length) {
+    if (wi < shuffledWords.length) readingPool.push(shuffledWords[wi++]);
+    if (wi < shuffledWords.length) readingPool.push(shuffledWords[wi++]);
+    if (si < shuffledSents.length) readingPool.push(shuffledSents[si++]);
+  }
+  readingIdx = 0;
+  readingShowMeaning = false;
+
+  if (readingPool.length === 0) { readingPool = vocab.filter(v => v.travel).slice(0, 20).map(v => ({ type: 'word', zh: v.zh, pinyin: v.pinyin, en: v.en, memo: v.memo })); }
+
+  showScreen('game');
+  gameState = 'reading';
+  showReadingCard();
+}
+
+function showReadingCard() {
+  if (readingIdx >= readingPool.length) { readingIdx = 0; readingPool.sort(() => Math.random() - 0.5); }
+  const card = readingPool[readingIdx];
+  readingShowMeaning = false;
+
+  const isSentence = card.type === 'sentence';
+  const fontSize = isSentence ? '3rem' : '7rem';
+
+  document.getElementById('drill-badge').textContent = isSentence ? 'READING — SENTENCE' : 'READING — WORD';
+  document.getElementById('prompt-area').innerHTML = `
+    <div style="font-size:${fontSize};font-family:'PingFang SC','Noto Sans SC',sans-serif;line-height:1.2;letter-spacing:0.05em">${card.zh}</div>
+    <div id="reading-pinyin" style="font-size:1.2rem;color:var(--accent2);margin-top:12px;visibility:hidden">${card.pinyin}</div>
+    <div id="reading-en" style="font-size:1.1rem;color:var(--dim);margin-top:8px;visibility:hidden">${card.en}</div>
+    ${card.memo ? `<div id="reading-memo" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 14px;margin-top:12px;max-width:500px;font-size:0.8rem;line-height:1.4;color:var(--dim);visibility:hidden">${card.memo}</div>` : ''}
+    <button class="audio-btn" onclick="replayAudio()" style="margin-top:12px">🔊</button>
+  `;
+  document.getElementById('choices').innerHTML = '';
+  document.getElementById('feedback').innerHTML = `<div style="color:var(--dim);font-size:0.8rem"><kbd style="background:var(--border);color:var(--text);padding:1px 6px;border-radius:3px">Space</kbd> reveal · <kbd style="background:var(--border);color:var(--text);padding:1px 6px;border-radius:3px">→</kbd> next · <kbd style="background:var(--border);color:var(--text);padding:1px 6px;border-radius:3px">R</kbd> replay · <kbd style="background:var(--border);color:var(--text);padding:1px 6px;border-radius:3px">N</kbd> note · <kbd style="background:var(--border);color:var(--text);padding:1px 6px;border-radius:3px">Q</kbd> quit</div>`;
+  document.getElementById('feedback').className = 'feedback';
+
+  lastAudioText = card.zh;
+  playAudio(card.zh, isSentence ? T('sentenceAudioRate') : 160);
+  updateHUD();
+}
+
+function revealReading() {
+  readingShowMeaning = true;
+  const pinyin = document.getElementById('reading-pinyin');
+  const en = document.getElementById('reading-en');
+  const memo = document.getElementById('reading-memo');
+  if (pinyin) pinyin.style.visibility = 'visible';
+  if (en) en.style.visibility = 'visible';
+  if (memo) memo.style.visibility = 'visible';
+}
+
+function nextReadingCard() {
+  readingIdx++;
+  showReadingCard();
+}
+
+// ─── NOTES ──────────────────────────────────────────
+let noteOpen = false;
+
+function toggleNote() {
+  const existing = document.getElementById('note-area');
+  if (existing) { existing.remove(); noteOpen = false; return; }
+
+  // Figure out which word we're looking at
+  let vocabId = null;
+  if (gameState === 'reading') {
+    const card = readingPool[readingIdx];
+    if (card) {
+      const v = vocab.find(x => x.zh === card.zh);
+      if (v) vocabId = v.id;
+    }
+  } else if (currentQ?.vocabId) {
+    vocabId = currentQ.vocabId;
+  }
+  if (!vocabId) return;
+
+  const v = vocab.find(x => x.id === vocabId);
+  noteOpen = true;
+
+  const div = document.createElement('div');
+  div.id = 'note-area';
+  div.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--accent2);border-radius:8px;padding:12px 16px;width:400px;max-width:90vw;z-index:100';
+  div.innerHTML = `
+    <div style="font-size:0.75rem;color:var(--accent2);margin-bottom:6px">Note for ${v ? v.zh + ' ' + v.pinyin : 'this card'}</div>
+    <textarea id="note-input" placeholder="Tell Claude what's confusing, what would help, any issue..." style="width:100%;min-height:50px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;font-size:0.85rem;color:var(--text);font-family:inherit;resize:vertical"></textarea>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button id="note-send" style="background:var(--accent2);color:#000;border:none;padding:4px 14px;border-radius:4px;font-size:0.8rem;font-family:inherit;cursor:pointer">Save note</button>
+      <button id="note-cancel" style="background:none;border:1px solid var(--border);color:var(--dim);padding:4px 14px;border-radius:4px;font-size:0.8rem;font-family:inherit;cursor:pointer">Cancel</button>
+    </div>`;
+
+  document.body.appendChild(div);
+
+  const input = document.getElementById('note-input');
+  input.focus();
+  input.addEventListener('keydown', e => e.stopPropagation());
+
+  document.getElementById('note-send').onclick = async () => {
+    const note = input.value.trim();
+    if (note) {
+      await fetch('/api/note', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ vocabId, note }) });
+    }
+    div.remove();
+    noteOpen = false;
+  };
+
+  document.getElementById('note-cancel').onclick = () => {
+    div.remove();
+    noteOpen = false;
+  };
+}
+
 // ─── KEYBOARD ───────────────────────────────────────
 document.addEventListener('keydown', (e) => {
   const activeScreen = document.querySelector('.screen.active');
@@ -997,6 +1270,7 @@ document.addEventListener('keydown', (e) => {
 
   if (activeScreen.id === 'splash') {
     if (e.key === '1' || e.key === ' ' || e.code === 'Space') { e.preventDefault(); startMode(); }
+    else if (e.key === '2') startReadingMode();
     else if (e.key === '5') showStats();
     return;
   }
@@ -1008,8 +1282,25 @@ document.addEventListener('keydown', (e) => {
   }
 
   if (activeScreen.id === 'game') {
-    if (e.key === 'q' || e.key === 'Q') { saveSession(); showSplash(); return; }
+    if (noteOpen) return; // don't process game keys while note is open
+    if (e.key === 'q' || e.key === 'Q') { if (gameState !== 'reading') saveSession(); showSplash(); return; }
     if (e.key === 'r' || e.key === 'R') { replayAudio(); return; }
+    if (e.key === 'n' || e.key === 'N') { toggleNote(); return; }
+
+    // Reading mode
+    if (gameState === 'reading') {
+      if (e.code === 'Space' || e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        if (!readingShowMeaning) revealReading();
+        else nextReadingCard();
+      } else if (e.key === 'ArrowRight') {
+        nextReadingCard();
+      } else if (e.key === 'ArrowLeft' && readingIdx > 0) {
+        readingIdx--;
+        showReadingCard();
+      }
+      return;
+    }
 
     const isAdvance = e.code === 'Space' || e.key === ' ' || e.key === 'Enter';
     const isNum = ['1','2','3','4'].includes(e.key);
@@ -1027,6 +1318,19 @@ document.addEventListener('keydown', (e) => {
     }
 
     if (gameState === 'question' && !answered) {
+      // Character study: only 1/2 valid, Space = choice 1 ("I can see it")
+      if (currentQ?.isCharStudy) {
+        if (e.key === '1') handleAnswer(0);
+        else if (e.key === '2') handleAnswer(1);
+        else if (isAdvance) { e.preventDefault(); handleAnswer(0); }
+        return;
+      }
+      if (e.key === 'g' || e.key === 'G') {
+        guessing = true;
+        const lgBtn = document.querySelectorAll('.choice.dont-know')[1];
+        if (lgBtn) { lgBtn.style.borderColor = 'var(--accent)'; lgBtn.innerHTML = `<span class="choice-key" style="background:var(--accent)">G</span><span>Guessing — pick your answer</span>`; }
+        return;
+      }
       if (e.key === '0' || isAdvance) { e.preventDefault(); handleDontKnow(); }
       else if (isNum) handleAnswer(parseInt(e.key) - 1);
     }

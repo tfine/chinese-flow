@@ -58,7 +58,7 @@ Claude Code is the coach. This is not passive — every conversation should incl
 - **Write `data/assessment.json`** — message, focus areas, weekly goal. App displays this.
 - **Edit `data/vocabulary.json`** — add words targeting weak areas, add travel-critical phrases as trip approaches.
 - **Edit `data/sentences.json`** — add sentences that exercise weak vocabulary in context.
-- **Edit `public/app.js` constants** — `MAX_NEW_PER_SESSION` (slow down or speed up introduction rate).
+- **Edit `data/settings.json` tuning parameters** — all engine behavior is configurable. See tuning section below.
 - **Run `npm run report`** — generate a full progress report.
 - **Discuss with user** — explain what the signals mean, what's actually being learned vs. just passed, suggest study strategies.
 
@@ -92,6 +92,38 @@ Claude Code is the coach. This is not passive — every conversation should incl
 ## Cascade Flow (Pimsleur Strategy)
 
 The cascade queue introduces new words then spirals back at expanding intervals within a single session: test immediately, then 2 items later, then 4 items later, varying the drill type each time. Wrong answers get re-inserted 2 positions ahead for immediate re-test. Due review cards (from SM-2) are interleaved. Sentences appear once enough vocabulary is known.
+
+## Tuning Parameters (`data/settings.json` → `tuning`)
+
+All engine behavior is controlled via `settings.tuning`. Claude Code can adjust these based on progress data. The app reads them via `T('paramName')` with built-in defaults.
+
+| Parameter | Default | What it controls |
+|---|---|---|
+| `newWordsPerSession` | 5 | Max new words introduced per session |
+| `maxInterval` | 21 | SM-2 interval cap in days |
+| `minDrillsForNewWord` | 4 | Guaranteed drills before engine moves on |
+| `newWordSpiralGap` | 2 | Questions between new-word re-tests |
+| `spotCheckRate` | 0.25 | % of questions that are random reviews |
+| `spotCheckRateDuringNewWords` | 0.10 | Reduced spot-check rate when new words need drilling |
+| `weaknessVsConfidenceRatio` | 0.7 | 70% weak drills, 30% confidence drills |
+| `charStudyTriggerThreshold` | 0.3 | Chance of character study when read/reverse gap detected |
+| `charStudyReadMin` | 0.9 | Min read accuracy to trigger char study |
+| `charStudyReverseMax` | 0.7 | Max reverse accuracy to trigger char study |
+| `deepDiveWrongThreshold` | 2 | Wrong answers before deep dive triggers |
+| `sessionCapCorrect` | 5 | Max drills per word per session (all correct) |
+| `sessionCapOneWrong` | 3 | Max drills per word per session (1 wrong) |
+| `speedThresholdFast` | 2000 | Response ms below this = quality 5 |
+| `speedThresholdMedium` | 4000 | Response ms below this = quality 4 |
+| `listeningRateShort` | 170 | TTS rate for short words |
+| `listeningRateLong` | 150 | TTS rate for 3+ character words |
+| `sentenceAudioRate` | 130 | TTS rate for sentences |
+| `introAudioRate` | 140 | TTS rate for new word introductions |
+| `sentenceInterval` | 12 | Questions between sentence challenges |
+| `maxSentencesPerSession` | 5 | Max sentences per session |
+| `strugglingThreshold` | 0.7 | Below this recent accuracy = struggling mode |
+| `cruisingThreshold` | 0.9 | Above this = cruising mode |
+| `cruisingNewWordGap` | 3 | Questions between new words when cruising |
+| `normalNewWordGap` | 5 | Questions between new words normally |
 
 ## TTS
 

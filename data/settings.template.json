@@ -3,5 +3,32 @@
     "label": "",
     "date": ""
   },
-  "newWordsPerSession": 5
+  "tuning": {
+    "newWordsPerSession": 5,
+    "maxInterval": 21,
+    "minDrillsForNewWord": 4,
+    "newWordSpiralGap": 2,
+    "spotCheckRate": 0.25,
+    "spotCheckRateDuringNewWords": 0.10,
+    "weaknessVsConfidenceRatio": 0.7,
+    "charStudyTriggerThreshold": 0.3,
+    "charStudyReadMin": 0.9,
+    "charStudyReverseMax": 0.7,
+    "deepDiveWrongThreshold": 2,
+    "sessionCapCorrect": 5,
+    "sessionCapOneWrong": 3,
+    "sessionCapTwoWrong": 0,
+    "speedThresholdFast": 2000,
+    "speedThresholdMedium": 4000,
+    "listeningRateShort": 170,
+    "listeningRateLong": 150,
+    "sentenceAudioRate": 130,
+    "introAudioRate": 140,
+    "sentenceInterval": 12,
+    "maxSentencesPerSession": 5,
+    "strugglingThreshold": 0.7,
+    "cruisingThreshold": 0.9,
+    "cruisingNewWordGap": 3,
+    "normalNewWordGap": 5
+  }
 }
