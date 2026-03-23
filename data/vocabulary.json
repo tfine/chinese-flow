@@ -726,7 +726,8 @@
     "en": "today",
     "cat": "time",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "今 = a roof covering NOW. 天 = sky/day (big person 大 under the sky 一). Under the roof of NOW + this DAY = TODAY."
   },
   {
     "id": "v074",
@@ -735,7 +736,8 @@
     "en": "tomorrow",
     "cat": "time",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "明 = sun (日) + moon (月). When you see the sun AND moon = TOMORROW (the next full cycle)."
   },
   {
     "id": "v075",
@@ -744,7 +746,8 @@
     "en": "yesterday",
     "cat": "time",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "昨 = sun (日) + made/did (乍). The sun that already happened = YESTERDAY."
   },
   {
     "id": "v076",
@@ -753,7 +756,8 @@
     "en": "now",
     "cat": "time",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "现 = king (王) + see (见). The king sees what is happening NOW. 在 = at/existing."
   },
   {
     "id": "v077",
@@ -762,7 +766,8 @@
     "en": "time / moment",
     "cat": "time",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "时 = sun (日) + inch (寸). An inch of sunlight = a MOMENT in TIME."
   },
   {
     "id": "v078",
@@ -771,7 +776,8 @@
     "en": "morning",
     "cat": "time",
     "hsk": 2,
-    "travel": true
+    "travel": true,
+    "memo": "早 = sun (日) on top of ten (十). The sun at the top of its first ten degrees = MORNING. 上 = on/up."
   },
   {
     "id": "v079",
@@ -780,7 +786,8 @@
     "en": "evening",
     "cat": "time",
     "hsk": 2,
-    "travel": true
+    "travel": true,
+    "memo": "晚 = sun (日) + exempt/free (免). When the sun is freed from duty = EVENING. 上 = on/up."
   },
   {
     "id": "v080",
@@ -789,7 +796,8 @@
     "en": "want / need",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "要 = west (覀) + woman (女). A woman heading west WANTS something on her journey."
   },
   {
     "id": "v081",
@@ -798,7 +806,8 @@
     "en": "have / there is",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "有 = hand (ナ) + moon (月). If you can reach out and grab the moon, you HAVE it."
   },
   {
     "id": "v082",
@@ -807,7 +816,8 @@
     "en": "go",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "去 = earth (土) + a step away. Stepping away from the earth = GO."
   },
   {
     "id": "v083",
@@ -816,7 +826,8 @@
     "en": "come",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "来 = a tree (木) with fruit hanging. Fruit COMES to the tree = COME."
   },
   {
     "id": "v084",
@@ -825,7 +836,8 @@
     "en": "eat",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "吃 = mouth (口) + beg (乞). Your mouth begs for food = EAT."
   },
   {
     "id": "v085",
@@ -834,7 +846,8 @@
     "en": "drink",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "喝 = mouth (口) + why/how (曷). Your mouth asks how to quench thirst = DRINK."
   },
   {
     "id": "v086",
@@ -843,7 +856,8 @@
     "en": "look / see",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "看 = hand (手) shading eyes (目). Hand over eyes to LOOK/SEE."
   },
   {
     "id": "v087",
@@ -852,7 +866,8 @@
     "en": "speak / say",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "说 = speech (讠) + exchange (兑). Exchanging speech = SPEAK/SAY."
   },
   {
     "id": "v088",
@@ -861,7 +876,8 @@
     "en": "listen",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "听 = mouth (口) + weight (斤). Weighing the words from someone's mouth = LISTEN."
   },
   {
     "id": "v089",
@@ -870,7 +886,8 @@
     "en": "know",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "知 = arrow (矢) + mouth (口). Words that hit like arrows = you KNOW. 道 = path/way."
   },
   {
     "id": "v090",
@@ -879,7 +896,8 @@
     "en": "can / may",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "可 = a nail in a mouth — \"it CAN be done!\" 以 = because/with. Together = CAN/MAY."
   },
   {
     "id": "v091",
@@ -888,7 +906,8 @@
     "en": "can / will",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "会 = a roof (亠) + cloud (云). Ideas gathering under a roof like clouds = able to/WILL."
   },
   {
     "id": "v092",
@@ -897,7 +916,8 @@
     "en": "want / think",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "想 = mutual (相) + heart (心). What your heart reaches toward = WANT/THINK."
   },
   {
     "id": "v093",
@@ -906,7 +926,8 @@
     "en": "walk / go",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "走 = earth (土) + running legs at the bottom. Running across the earth = WALK/GO."
   },
   {
     "id": "v094",
@@ -915,7 +936,8 @@
     "en": "live / stay",
     "cat": "verbs",
     "hsk": 2,
-    "travel": true
+    "travel": true,
+    "memo": "住 = person (亻) + master (主). A person who is master of a place LIVES/STAYS there."
   },
   {
     "id": "v095",
@@ -924,7 +946,8 @@
     "en": "buy",
     "cat": "verbs",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "买 = head/top (头) simplified + legs. Running around with stuff on your head = BUY."
   },
   {
     "id": "v096",
@@ -933,7 +956,8 @@
     "en": "give",
     "cat": "verbs",
     "hsk": 2,
-    "travel": true
+    "travel": true,
+    "memo": "给 = thread (纟) + join (合). Threading things together to GIVE them."
   },
   {
     "id": "v097",
@@ -942,7 +966,8 @@
     "en": "very",
     "cat": "basics",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "很 = step (彳) + stubborn (艮). Stubbornly stepping forward = VERY."
   },
   {
     "id": "v098",
@@ -951,7 +976,8 @@
     "en": "also",
     "cat": "basics",
     "hsk": 1,
-    "travel": false
+    "travel": false,
+    "memo": "也 = a scorpion shape — where there's one, there's ALSO another."
   },
   {
     "id": "v099",
@@ -960,7 +986,8 @@
     "en": "all / both",
     "cat": "basics",
     "hsk": 1,
-    "travel": false
+    "travel": false,
+    "memo": "都 = a city/all (者) + city radical (阝). In a city, ALL people gather."
   },
   {
     "id": "v100",
@@ -969,7 +996,8 @@
     "en": "you're welcome",
     "cat": "greetings",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "不 (not) + 客气 (polite air). \"Don't be polite!\" = YOU'RE WELCOME."
   },
   {
     "id": "v101",
@@ -978,7 +1006,8 @@
     "en": "excuse me (asking)",
     "cat": "greetings",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "请 (please) + 问 (ask). Please + ask = EXCUSE ME (when asking a question)."
   },
   {
     "id": "v102",
@@ -987,7 +1016,8 @@
     "en": "it doesn't matter",
     "cat": "greetings",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "没 (not have) + 关系 (relationship). \"No relationship to worry about\" = IT DOESN'T MATTER."
   },
   {
     "id": "v103",
@@ -996,7 +1026,8 @@
     "en": "at / in / is doing",
     "cat": "basics",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "在 = earth (土) + exist (才). Existing on the earth = AT/IN. Also marks ongoing action."
   },
   {
     "id": "v104",
@@ -1005,7 +1036,8 @@
     "en": "(possessive particle)",
     "cat": "basics",
     "hsk": 1,
-    "travel": false
+    "travel": false,
+    "memo": "的 = white (白) + spoon (勺). The white spoon BELONGS TO someone = possessive particle."
   },
   {
     "id": "v105",
@@ -1014,7 +1046,8 @@
     "en": "(completed action)",
     "cat": "basics",
     "hsk": 1,
-    "travel": false
+    "travel": false,
+    "memo": "了 = a hook that catches the action and marks it COMPLETED."
   },
   {
     "id": "v106",
@@ -1023,7 +1056,8 @@
     "en": "(question particle)",
     "cat": "basics",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "吗 = mouth (口) + horse (马). A mouth making a horse sound at the end = QUESTION marker."
   },
   {
     "id": "v107",
@@ -1032,7 +1066,8 @@
     "en": "person / people",
     "cat": "basics",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "人 looks like a walking PERSON — two legs in stride."
   },
   {
     "id": "v108",
@@ -1041,7 +1076,8 @@
     "en": "China",
     "cat": "places",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "中 = center/middle (an arrow through the center). 国 = territory (a jade 玉 inside borders 囗). Center territory = CHINA."
   },
   {
     "id": "v109",
@@ -1050,7 +1086,8 @@
     "en": "America",
     "cat": "places",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "美 = big (大) + sheep (羊). A big beautiful sheep = BEAUTIFUL. 国 = country. Beautiful country = AMERICA."
   },
   {
     "id": "v110",
@@ -1059,7 +1096,8 @@
     "en": "friend",
     "cat": "people",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "朋 = two moons (月月) side by side. 友 = two hands reaching. Two people reaching for each other under moonlight = FRIEND."
   },
   {
     "id": "v111",
@@ -1068,7 +1106,8 @@
     "en": "excuse me / embarrassed",
     "cat": "greetings",
     "hsk": 2,
-    "travel": true
+    "travel": true,
+    "memo": "不好意思 = not + good + meaning + think. \"My meaning is not good\" = EXCUSE ME / I'M EMBARRASSED."
   },
   {
     "id": "v112",
@@ -1077,7 +1116,8 @@
     "en": "I don't understand",
     "cat": "survival",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "我 (I) + 不 (not) + 懂 (understand). 懂 = heart (忄) + meaning. My heart doesn't grasp the meaning = I DON'T UNDERSTAND."
   },
   {
     "id": "v113",
@@ -1086,7 +1126,8 @@
     "en": "I can't speak Chinese",
     "cat": "survival",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "我 (I) + 不会 (cannot) + 说 (speak) + 中文 (Chinese). I cannot speak Chinese — your survival phrase!"
   },
   {
     "id": "v114",
@@ -1095,7 +1136,8 @@
     "en": "do you speak English?",
     "cat": "survival",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "你 (you) + 会 (can) + 说 (speak) + 英语 (English) + 吗 (?)  = DO YOU SPEAK ENGLISH?"
   },
   {
     "id": "v115",
@@ -1104,7 +1146,8 @@
     "en": "how much money?",
     "cat": "shopping",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "多少 (how much) + 钱 (money) = HOW MUCH MONEY? The most important shopping phrase."
   },
   {
     "id": "v116",
@@ -1113,7 +1156,8 @@
     "en": "great! / awesome!",
     "cat": "basics",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "太 (too/very) + 好 (good) + 了 (emphasis) = TOO GOOD = GREAT/AWESOME!"
   },
   {
     "id": "v117",
@@ -1122,7 +1166,8 @@
     "en": "don't have / there isn't",
     "cat": "basics",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "没 (not) + 有 (have) = DON'T HAVE / THERE ISN'T. Opposite of 有."
   },
   {
     "id": "v118",
@@ -1131,7 +1176,8 @@
     "en": "toilet",
     "cat": "emergency",
     "hsk": 2,
-    "travel": true
+    "travel": true,
+    "memo": "厕 = a shelter (厂) for measured (则) activities. 所 = place. A sheltered place = TOILET."
   },
   {
     "id": "v119",
@@ -1140,7 +1186,8 @@
     "en": "hail a taxi",
     "cat": "transport",
     "hsk": 2,
-    "travel": true
+    "travel": true,
+    "memo": "打 (hit/strike) + 车 (vehicle). Strike/summon a vehicle = HAIL A TAXI."
   },
   {
     "id": "v120",
@@ -1149,6 +1196,307 @@
     "en": "I want to go to",
     "cat": "transport",
     "hsk": 1,
-    "travel": true
+    "travel": true,
+    "memo": "我 (I) + 要 (want) + 去 (go) = I WANT TO GO TO. Combine with any destination!"
+  },
+  {
+    "id": "v121",
+    "zh": "热",
+    "pinyin": "rè",
+    "en": "hot",
+    "cat": "basics",
+    "hsk": 2,
+    "travel": true,
+    "memo": "热 = hand (扌) + circle (丸) + fire (灬) at the bottom. Holding something over fire = HOT."
+  },
+  {
+    "id": "v122",
+    "zh": "冷",
+    "pinyin": "lěng",
+    "en": "cold",
+    "cat": "basics",
+    "hsk": 2,
+    "travel": true,
+    "memo": "冷 = ice (冫) + command (令). Ice commands the temperature = COLD."
+  },
+  {
+    "id": "v123",
+    "zh": "快",
+    "pinyin": "kuài",
+    "en": "fast / quick",
+    "cat": "basics",
+    "hsk": 2,
+    "travel": true,
+    "memo": "快 = heart (忄) + decisive (夬). A decisive heart moves FAST."
+  },
+  {
+    "id": "v124",
+    "zh": "慢",
+    "pinyin": "màn",
+    "en": "slow",
+    "cat": "basics",
+    "hsk": 2,
+    "travel": true,
+    "memo": "慢 = heart (忄) + graceful (曼). A graceful heart moves SLOW."
+  },
+  {
+    "id": "v125",
+    "zh": "远",
+    "pinyin": "yuǎn",
+    "en": "far",
+    "cat": "directions",
+    "hsk": 2,
+    "travel": true,
+    "memo": "远 = walk (辶) + origin (元). Walking back to the origin is FAR."
+  },
+  {
+    "id": "v126",
+    "zh": "近",
+    "pinyin": "jìn",
+    "en": "near",
+    "cat": "directions",
+    "hsk": 2,
+    "travel": true,
+    "memo": "近 = walk (辶) + axe (斤). Only a short walk with an axe = NEAR."
+  },
+  {
+    "id": "v127",
+    "zh": "开",
+    "pinyin": "kāi",
+    "en": "open / start",
+    "cat": "verbs",
+    "hsk": 1,
+    "travel": true,
+    "memo": "开 looks like two hands pulling a gate OPEN."
+  },
+  {
+    "id": "v128",
+    "zh": "关",
+    "pinyin": "guān",
+    "en": "close / turn off",
+    "cat": "verbs",
+    "hsk": 2,
+    "travel": true,
+    "memo": "关 = two bars closing a gate. CLOSE/shut."
+  },
+  {
+    "id": "v129",
+    "zh": "等",
+    "pinyin": "děng",
+    "en": "wait",
+    "cat": "verbs",
+    "hsk": 2,
+    "travel": true,
+    "memo": "等 = bamboo (⺮) + temple (寺). Waiting at a bamboo temple = WAIT."
+  },
+  {
+    "id": "v130",
+    "zh": "找",
+    "pinyin": "zhǎo",
+    "en": "look for / find",
+    "cat": "verbs",
+    "hsk": 2,
+    "travel": true,
+    "memo": "找 = hand (扌) + spear (戈). Hand reaching for a spear = LOOK FOR / FIND."
+  },
+  {
+    "id": "v131",
+    "zh": "换",
+    "pinyin": "huàn",
+    "en": "change / exchange",
+    "cat": "verbs",
+    "hsk": 2,
+    "travel": true,
+    "memo": "换 = hand (扌) + big (奂). Hand swapping something big = CHANGE/EXCHANGE. Useful for money exchange!"
+  },
+  {
+    "id": "v132",
+    "zh": "路",
+    "pinyin": "lù",
+    "en": "road / way",
+    "cat": "directions",
+    "hsk": 2,
+    "travel": true,
+    "memo": "路 = foot (足) + each (各). Each foot on the path = ROAD."
+  },
+  {
+    "id": "v133",
+    "zh": "东",
+    "pinyin": "dōng",
+    "en": "east",
+    "cat": "directions",
+    "hsk": 2,
+    "travel": true,
+    "memo": "东 = the sun (日) rising behind a tree (木) = EAST, where the sun rises."
+  },
+  {
+    "id": "v134",
+    "zh": "西",
+    "pinyin": "xī",
+    "en": "west",
+    "cat": "directions",
+    "hsk": 2,
+    "travel": true,
+    "memo": "西 = a bird nesting as the sun sets = WEST. (Also means \"thing\" in 东西.)"
+  },
+  {
+    "id": "v135",
+    "zh": "东西",
+    "pinyin": "dōng xi",
+    "en": "thing / stuff",
+    "cat": "basics",
+    "hsk": 1,
+    "travel": true,
+    "memo": "东 (east) + 西 (west) = from east to west = everything = THING/STUFF."
+  },
+  {
+    "id": "v136",
+    "zh": "北京",
+    "pinyin": "běi jīng",
+    "en": "Beijing",
+    "cat": "places",
+    "hsk": 1,
+    "travel": true,
+    "memo": "北 (north) + 京 (capital) = Northern Capital = BEIJING."
+  },
+  {
+    "id": "v137",
+    "zh": "上海",
+    "pinyin": "shàng hǎi",
+    "en": "Shanghai",
+    "cat": "places",
+    "hsk": 1,
+    "travel": true,
+    "memo": "上 (above/on) + 海 (sea) = On the Sea = SHANGHAI."
+  },
+  {
+    "id": "v138",
+    "zh": "手机",
+    "pinyin": "shǒu jī",
+    "en": "cell phone",
+    "cat": "basics",
+    "hsk": 2,
+    "travel": true,
+    "memo": "手 (hand) + 机 (machine) = hand machine = CELL PHONE."
+  },
+  {
+    "id": "v139",
+    "zh": "WiFi密码",
+    "pinyin": "WiFi mì mǎ",
+    "en": "WiFi password",
+    "cat": "basics",
+    "hsk": 2,
+    "travel": true,
+    "memo": "密 (secret) + 码 (code) = secret code = PASSWORD. Essential for travel!"
+  },
+  {
+    "id": "v140",
+    "zh": "护照",
+    "pinyin": "hù zhào",
+    "en": "passport",
+    "cat": "transport",
+    "hsk": 2,
+    "travel": true,
+    "memo": "护 (protect) + 照 (shine/photo) = protective document with photo = PASSPORT."
+  },
+  {
+    "id": "v141",
+    "zh": "签证",
+    "pinyin": "qiān zhèng",
+    "en": "visa",
+    "cat": "transport",
+    "hsk": 2,
+    "travel": true,
+    "memo": "签 (sign) + 证 (certificate) = signed certificate = VISA."
+  },
+  {
+    "id": "v142",
+    "zh": "行李",
+    "pinyin": "xíng li",
+    "en": "luggage",
+    "cat": "transport",
+    "hsk": 2,
+    "travel": true,
+    "memo": "行 (travel) + 李 (plums/belongings) = travel belongings = LUGGAGE."
+  },
+  {
+    "id": "v143",
+    "zh": "房间",
+    "pinyin": "fáng jiān",
+    "en": "room",
+    "cat": "transport",
+    "hsk": 2,
+    "travel": true,
+    "memo": "房 (house) + 间 (between/space) = a space in a house = ROOM."
+  },
+  {
+    "id": "v144",
+    "zh": "吃饭",
+    "pinyin": "chī fàn",
+    "en": "eat a meal",
+    "cat": "food",
+    "hsk": 1,
+    "travel": true,
+    "memo": "吃 (eat) + 饭 (rice/meal). Eating rice = having a MEAL. The universal Chinese invite!"
+  },
+  {
+    "id": "v145",
+    "zh": "服务员",
+    "pinyin": "fú wù yuán",
+    "en": "waiter / attendant",
+    "cat": "food",
+    "hsk": 2,
+    "travel": true,
+    "memo": "服务 (service) + 员 (person) = service person = WAITER. Shout this to get attention in restaurants!"
+  },
+  {
+    "id": "v146",
+    "zh": "不要",
+    "pinyin": "bú yào",
+    "en": "don't want",
+    "cat": "basics",
+    "hsk": 1,
+    "travel": true,
+    "memo": "不 (not) + 要 (want) = DON'T WANT. Essential for refusing hawkers!"
+  },
+  {
+    "id": "v147",
+    "zh": "可以",
+    "pinyin": "kě yǐ",
+    "en": "can / OK",
+    "cat": "basics",
+    "hsk": 1,
+    "travel": true,
+    "memo": "可 (able) + 以 (by means of) = CAN / OK. The universal permission word."
+  },
+  {
+    "id": "v148",
+    "zh": "没问题",
+    "pinyin": "méi wèn tí",
+    "en": "no problem",
+    "cat": "basics",
+    "hsk": 2,
+    "travel": true,
+    "memo": "没 (not have) + 问题 (question/problem) = NO PROBLEM. You'll hear this constantly."
+  },
+  {
+    "id": "v149",
+    "zh": "危险",
+    "pinyin": "wēi xiǎn",
+    "en": "dangerous",
+    "cat": "emergency",
+    "hsk": 2,
+    "travel": true,
+    "memo": "危 (perilous) + 险 (steep/risky) = DANGEROUS. Important safety word."
+  },
+  {
+    "id": "v150",
+    "zh": "小心",
+    "pinyin": "xiǎo xīn",
+    "en": "be careful",
+    "cat": "emergency",
+    "hsk": 2,
+    "travel": true,
+    "memo": "小 (small) + 心 (heart) = make your heart small/cautious = BE CAREFUL."
   }
 ]
