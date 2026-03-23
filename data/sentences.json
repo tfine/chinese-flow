@@ -1,0 +1,22 @@
+[
+  {"id":"s001","zh":"你好，请问洗手间在哪里？","pinyin":"nǐ hǎo, qǐng wèn xǐ shǒu jiān zài nǎ lǐ?","en":"Hello, excuse me, where is the restroom?","cat":"survival","diff":1},
+  {"id":"s002","zh":"这个多少钱？","pinyin":"zhè ge duō shao qián?","en":"How much is this?","cat":"shopping","diff":1},
+  {"id":"s003","zh":"我要一杯茶。","pinyin":"wǒ yào yì bēi chá.","en":"I want a cup of tea.","cat":"food","diff":1},
+  {"id":"s004","zh":"请给我菜单。","pinyin":"qǐng gěi wǒ cài dān.","en":"Please give me the menu.","cat":"food","diff":1},
+  {"id":"s005","zh":"我不懂，请说慢一点。","pinyin":"wǒ bù dǒng, qǐng shuō màn yì diǎn.","en":"I don't understand, please speak slower.","cat":"survival","diff":1},
+  {"id":"s006","zh":"我要去机场。","pinyin":"wǒ yào qù jī chǎng.","en":"I want to go to the airport.","cat":"transport","diff":1},
+  {"id":"s007","zh":"太贵了，便宜一点吧。","pinyin":"tài guì le, pián yi yì diǎn ba.","en":"Too expensive, make it cheaper.","cat":"shopping","diff":2},
+  {"id":"s008","zh":"请问地铁站在哪里？","pinyin":"qǐng wèn dì tiě zhàn zài nǎ lǐ?","en":"Excuse me, where is the subway station?","cat":"transport","diff":1},
+  {"id":"s009","zh":"我想买两张票。","pinyin":"wǒ xiǎng mǎi liǎng zhāng piào.","en":"I want to buy two tickets.","cat":"transport","diff":2},
+  {"id":"s010","zh":"这个菜很好吃。","pinyin":"zhè ge cài hěn hǎo chī.","en":"This dish is very delicious.","cat":"food","diff":1},
+  {"id":"s011","zh":"我住在这个酒店。","pinyin":"wǒ zhù zài zhè ge jiǔ diàn.","en":"I'm staying at this hotel.","cat":"transport","diff":2},
+  {"id":"s012","zh":"你会说英语吗？","pinyin":"nǐ huì shuō yīng yǔ ma?","en":"Do you speak English?","cat":"survival","diff":1},
+  {"id":"s013","zh":"往左走还是往右走？","pinyin":"wǎng zuǒ zǒu hái shi wǎng yòu zǒu?","en":"Go left or go right?","cat":"directions","diff":2},
+  {"id":"s014","zh":"我要一瓶水。","pinyin":"wǒ yào yì píng shuǐ.","en":"I want a bottle of water.","cat":"food","diff":1},
+  {"id":"s015","zh":"明天早上几点出发？","pinyin":"míng tiān zǎo shang jǐ diǎn chū fā?","en":"What time do we leave tomorrow morning?","cat":"time","diff":2},
+  {"id":"s016","zh":"可以帮我叫一个出租车吗？","pinyin":"kě yǐ bāng wǒ jiào yí gè chū zū chē ma?","en":"Can you help me call a taxi?","cat":"transport","diff":2},
+  {"id":"s017","zh":"我是美国人。","pinyin":"wǒ shì měi guó rén.","en":"I am American.","cat":"basics","diff":1},
+  {"id":"s018","zh":"买单，谢谢。","pinyin":"mǎi dān, xiè xie.","en":"Check please, thank you.","cat":"food","diff":1},
+  {"id":"s019","zh":"请问附近有医院吗？","pinyin":"qǐng wèn fù jìn yǒu yī yuàn ma?","en":"Excuse me, is there a hospital nearby?","cat":"emergency","diff":2},
+  {"id":"s020","zh":"我的朋友在那里。","pinyin":"wǒ de péng you zài nà lǐ.","en":"My friend is over there.","cat":"basics","diff":1}
+]

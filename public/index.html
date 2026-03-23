@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中文 Flow</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <!-- SPLASH -->
+  <div id="splash" class="screen active">
+    <div class="splash-content">
+      <h1>中文 <span class="accent">Flow</span></h1>
+      <p class="subtitle">Cascading Chinese — Pimsleur meets arcade</p>
+      <div class="trip-countdown" id="trip-countdown"></div>
+
+      <!-- Coach panel - Claude's latest assessment -->
+      <div class="coach-panel" id="coach-panel">
+        <div class="coach-header">COACH</div>
+        <div class="coach-message" id="coach-message">Loading...</div>
+        <div class="coach-focus" id="coach-focus"></div>
+        <div class="coach-goal" id="coach-goal"></div>
+      </div>
+
+      <div class="menu">
+        <button data-key="1" onclick="startMode('cascade')" class="btn-go"><kbd>Space</kbd> Start Learning</button>
+        <button data-key="5" onclick="showStats()"><kbd>5</kbd> Progress Report</button>
+      </div>
+      <div class="due-info" id="due-info"></div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="game" class="screen">
+    <div class="hud">
+      <div class="hud-left">
+        <span id="hud-score">0</span> / <span id="hud-total">0</span>
+        <div class="streak-display" id="streak-display"></div>
+      </div>
+      <div class="hud-center">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+      </div>
+      <div class="hud-right">
+        <span id="hud-accuracy">100%</span>
+        <span class="timer" id="timer">0.0s</span>
+      </div>
+    </div>
+
+    <div class="game-area">
+      <div class="drill-type-badge" id="drill-badge"></div>
+      <div class="prompt-area" id="prompt-area">
+        <div class="prompt-chinese" id="prompt-zh"></div>
+        <div class="prompt-pinyin" id="prompt-pinyin"></div>
+        <div class="prompt-english" id="prompt-en"></div>
+        <button class="audio-btn" id="audio-btn" onclick="replayAudio()">🔊</button>
+      </div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="hint-bar" id="hint-bar"><kbd>1</kbd>-<kbd>4</kbd> answer · <kbd>Space</kbd> don't know · <kbd>R</kbd> replay · <kbd>Q</kbd> quit</div>
+    </div>
+  </div>
+
+  <!-- STATS / SESSION SUMMARY -->
+  <div id="stats" class="screen">
+    <div class="stats-content" id="stats-content"></div>
+    <div class="stats-actions">
+      <button onclick="showSplash()"><kbd>Q</kbd> Back to Menu</button>
+      <button onclick="startMode('cascade')" class="btn-primary"><kbd>1</kbd> Keep Going</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

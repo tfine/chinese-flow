@@ -1,0 +1,6 @@
+node_modules/
+data/progress.json
+data/sessions/
+data/reports/
+data/assessment.json
+.DS_Store

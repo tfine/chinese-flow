@@ -1,0 +1,13 @@
+{
+  "name": "chinese-flow",
+  "version": "1.0.0",
+  "description": "Pimsleur-inspired cascading Chinese learning game",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "report": "node scripts/generate-report.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
