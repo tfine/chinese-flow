@@ -275,7 +275,7 @@ kbd {
 }
 
 .prompt-chinese {
-  font-size: 4rem;
+  font-size: 6rem;
   font-weight: 300;
   letter-spacing: 0.05em;
   line-height: 1.2;
@@ -359,6 +359,7 @@ kbd {
 
 .choice .choice-chinese {
   font-family: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-size: 1.5rem;
 }
 
 .choice.dont-know {
@@ -383,6 +384,12 @@ kbd {
 /* Deep dive teaching screen */
 .game-area .feedback div[style*="display:flex"] {
   flex-wrap: wrap;
+}
+
+/* Larger Chinese in feedback details */
+.feedback-detail {
+  font-family: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  font-size: 1.3rem;
 }
 
 .feedback {

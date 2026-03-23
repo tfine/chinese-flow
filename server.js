@@ -214,6 +214,7 @@ const server = createServer(async (req, res) => {
   try {
     const content = await readFile(fullPath);
     res.setHeader('Content-Type', MIME_TYPES[ext] || 'application/octet-stream');
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.end(content);
   } catch {
     res.writeHead(404);
